@@ -1,4 +1,4 @@
-#256064
+
 import discord
 from discord import channel
 from discord import client
@@ -25,7 +25,10 @@ async def help(ctx):
     emBed.add_field(name="s!help", value="คำสั่งที่สามารถใช้ได้", inline=False)
     emBed.add_field(name="s!hello", value="ทักทาย", inline=False)
     emBed.add_field(name="s!play", value="เล่นเพลง", inline=False)
-    emBed.add_field(name="s!leave", value="หยุดเพลง", inline=False)
+    emBed.add_field(name="s!pause", value="หยุดเพลงที่เล่น", inline=False)
+    emBed.add_field(name="s!resume", value="เล่นเพลงต่อจากเดิม", inline=False)
+    emBed.add_field(name="s!stop", value="หยุดเพลง", inline=False)
+    emBed.add_field(name="s!leave", value="ออกจากห้อง", inline=False)
     emBed.set_thumbnail(url="https://cdn.discordapp.com/attachments/861386789952290826/902391108112363581/Spine-logos.jpeg")
     emBed.set_footer(text="SpineBot", icon_url="https://cdn.discordapp.com/attachments/861386789952290826/902391108112363581/Spine-logos.jpeg")
     await ctx.channel.send(embed=emBed)
@@ -47,7 +50,7 @@ async def play(ctx, url):
     voice_client = get(bot.voice_clients, guild=ctx.guild)
 
     if voice_client == None:
-        ctx.channel.send("Joined")
+        await ctx.channel.send("เข้าร่วมแล้ว")
         await channel.connect()
         voice_client = get(bot.voice_clients, guild=ctx.guild)
 
@@ -65,7 +68,46 @@ async def play(ctx, url):
         return
 
 @bot.command()
+async def stop(ctx):
+    voice_client = get(bot.voice_clients, guild=ctx.guild)
+    if voice_client == None:
+        await ctx.channel.send("Bot is not connected to vc")
+        return
+
+    if voice_client.channel != ctx.author.voice.channel:
+        await ctx.channel.send("บอทกำลังเชื่อมต่อที่ห้อง %s " %voice_client.channel)
+        return
+
+    voice_client.stop()
+
+@bot.command()
+async def pause(ctx):
+    voice_client = get(bot.voice_clients, guild=ctx.guild)
+    if voice_client == None:
+        await ctx.channel.send("Bot is not connected to vc")
+        return
+
+    if voice_client.channel != ctx.author.voice.channel:
+        await ctx.channel.send("บอทกำลังเชื่อมต่อที่ห้อง %s " %voice_client.channel)
+        return
+
+    voice_client.pause()
+
+@bot.command()
+async def resume(ctx):
+    voice_client = get(bot.voice_clients, guild=ctx.guild)
+    if voice_client == None:
+        await ctx.channel.send("Bot is not connected to vc")
+        return
+
+    if voice_client.channel != ctx.author.voice.channel:
+        await ctx.channel.send("บอทกำลังเชื่อมต่อที่ห้อง %s " %voice_client.channel)
+        return
+
+    voice_client.resume()
+
+@bot.command()
 async def leave(ctx):
     await ctx.voice_client.disconnect()
 
-bot.run('OTAyMjUxMTY0MDIyNzUxMzMz.YXbs4A.rDcYqbJJFfaGPCBvt83bLiaEAI8')
+bot.run('')
